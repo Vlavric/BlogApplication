@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Blog Application</title>
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css">
+  
+</head>
+<body>
+    
+  <script type="text/x-handlebars">
+  <div class="navbar">
+      <div class="navbar-inner">
+          <a class="brand" > {{#link-to 'index'}}Flight Club Blogger{{/link-to}}</a>
+          <ul class="nav">
+              <li>{{#link-to 'posts'}}Posts{{/link-to}}</li>
+              <li>{{#link-to 'about'}}About{{/link-to}}</li>
+              {{#if user.authenticated}}
+              <li> <a href="#"{{ action 'logout'}}>Log out</a></li>
+              {{else}}
+              <li>{{#link-to 'login'}}Log in{{/link-to}}</li>
+              <li>{{#link-to 'signup'}}Sign Up{{/link-to}}</li>
+              {{/if}}
+          </ul>
+      </div>
+  </div>
+      
+  {{outlet}}
+  </script>
+    
+   <!--Template "home" -->    
+  <script type="text/x-handlebars" data-template-name="index">
+      <h1>Hi {{user.current.firs_name}}! Welcome to Brantford Flight Club Blogger</h1>
+      <h2>This is the home page</h2>
+      <p>This is Flight Club Blogger. I hope you all like it! </p>
+      
+  </script>
+
+  <!--Template "posts"-->    
+   <script type="text/x-handlebars" id="posts">
+      <div class="container-fluid">
+          <div class="row-fluid">
+          <div class="span3">
+              <table class="table">
+                  <thead>
+                    <tr><th>Recent Posts</th></tr>
+                    <tr><th>{{#link-to 'create'}}Create Blog{{/link-to}}</th></tr>
+                  </thead>
+                  {{#each}}
+                  <tr><td>
+                      {{#link-to 'post' this}}
+                    {{title}} <small class="muted">by {{author.name}}</small>
+                      {{/link-to}}
+                  </td></tr>
+                  {{/each}}
+              </table>
+          </div>
+          <div class="span9">
+              {{outlet}}
+          </div>
+        </div>
+      </div>
+  </script>
+    
+  <!-- Template "create" -->
+  <script type="text/x-handlebars" id="create">
+      <h2>Create New Blog</h2>
+      <p>{{input type="text" value=id placeholder="Blog ID"}}</p>
+      <p>{{input type="text" value=title placeholder="Title"}}</p>
+      <p>{{input type="text" value=author placeholder="Author Name"}}</p>
+      <p>{{input type="text" value=excerpt placeholder="Excerpt"}}</p>
+      <p>{{textarea value=body}}</p>
+      <botton>{{#link-to 'posts'}}Post Blog{{/link-to}}</botton>
+  </script>
+  
+  <!--Template "post"-->
+  <script type="text/x-handlebars" id="post">
+      {{#if isEditing}}
+      {{partial 'post/edit'}}
+      <button {{action 'doneEditing'}}>Done</button>
+      {{else}}
+      <button {{action 'edit'}}>Edit</button>
+      {{/if}}
+      <h1>{{title}}</h1>
+      <h2> by {{author.name}} <small class="muted">({{format-date date}})</small></h2>
+      <hr>
+      <div class="intro">
+          {{excerpt}}
+      </div>
+      <div class="below-the-fold">
+          {{body}}
+      </div>
+  </script>
+
+  <!--Template "edit"-->
+  <script type="text/x-handlebars" id="post/_edit">
+      <p>{{input type="text" value=title}}</p>
+      <p>{{input type="text" value=excerpt}}</p>
+      <p>{{textarea value=body}}</p>
+  </script>
+    
+  <!--Template "about" -->    
+  <script type="text/x-handlebars" id="about">
+      <div class='about'>
+          <p>We are students from <a href="http://conestogac.on.ca">Conestoga College</a>, and this is a 
+            small webpage designed for mobile. This web application is suposed to use <a href="http://emberjs.com">
+            Ember.js</a></p>
+          <p>Members of the project team are:</p>
+      </div>
+      <div class="about">
+          <p>Vadim Lavric</p>
+          <p>Krishna Bhandari</p>
+          <p>Zia Atif</p>
+      </div>
+  </script>
+    
+    <!--Template "login"-->    
+    <script type="text/x-handlebars" data-template-name="login">
+    <form class="form" {{action 'login' on='submit'}}>
+        <h2 class="form-heading">Please Log In</h2>
+        <div class="form-fields">
+        {{input id='username' placeholder='Username' class='form-control' value=username}}
+        <br />
+        {{input id='password' placeholder='Password' class='form-control' type='password' value=password}}
+      </div>
+        <!--
+        <label for="username">Username</label>
+        {{input id='username' placeholder='Enter Username' class='form-control' value=username}}
+        <label for="password">Password</label>
+        {{input id='password' placeholder='Enter Password' class='form-control' type='password' value=password}}
+        -->
+        <button type="submit" class="btn btn-default">Login</button>
+    </form>
+    {{#if error}}
+        <div class="alert alert-error">{{error.message}}</div>
+    {{/if}}
+    </script>
+    
+    
+    <!--Template "signup"-->
+    <script type="text/x-handlebars" data-template-name="signup">
+    <form {{action 'signup' on='submit'}}>
+        <label for="username">Username</label>
+        {{input id='username' placeholder='Enter a Username' class='form-control' value=username}}
+        <label for="name">Name</label>
+        {{input id='name' placeholder='Enter a your Name' class='form-control' value=first_name}}
+        <label for="email">Email</label>
+        {{input id='email' placeholder='Enter your Email' class='form-control' value=email}}
+        <label for="password">Password</label>
+        {{input id='password' placeholder='Enter a Password' class='form-control' type='password' value=password}}
+        <button type="submit" class="btn btn-default">Sign up</button>
+    </form>
+    {{#if error}}
+        <div class="alert alert-error">{{error.message}}</div>
+    {{/if}}
+    </script>
+
+  <script src="js/libs/jquery-1.10.2.js"></script>
+  <script src="js/libs/ember-template-compiler-1.10.0.js"></script>
+  <script src="js/libs/ember-1.10.0.debug.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/showdown/0.3.1/showdown.min.js"></script>    
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.1.0/moment.min.js"></script>
+  <script src="https://app.userapp.io/js/userapp.client.js"></script>
+  <script src="https://app.userapp.io/js/ember-userapp.js"></script>
+    
+  <script src="js/app.js"></script>
+  
+  <script src="tests/runner.js"></script>
+</body>
+</html>
